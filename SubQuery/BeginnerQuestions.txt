@@ -1,0 +1,60 @@
+--Viewing the Data in the Employee Table
+Select * from Employees;
+Select * from Departments;
+Select * from Projects;
+
+--Q1--Find employees earning more than the average salary
+
+Select * from Employees
+where Salary >(Select AVG(Salary) from Employees)
+
+--Q2--List employees working in the IT department
+
+Select * from Employees 
+where DeptID=(Select DeptID from Departments where DeptName='IT' );
+
+--Q3--Find employees earning more than the minimum salary
+
+Select * from Employees
+where salary>(Select MIN(Salary) from Employees)
+
+--Q4--Employees working in departments located in Mumbai 
+
+Select * from Employees
+where DeptID IN ( 
+   SELECT DeptID 
+   FROM Departments 
+   WHERE Location = 'Mumbai' 
+); 
+
+--Q5--Employee(s) with the highest salary
+
+Select * from Employees
+where Salary= (Select MAX(Salary) from Employees)
+
+--Q6--Employees hired after the earliest hire date
+
+Select * from Employees 
+where HireDate > (Select Min(HireDate) from Employees)
+
+--Q7--Employees whose department has at least one project 
+
+
+
+Select * from Employees as E where E.DeptID IN (
+Select D.DeptID from Departments as D
+join Projects
+ON D.DeptID= Projects.DeptID);
+
+
+SELECT * 
+FROM Employees 
+WHERE DeptID IN ( 
+   SELECT DISTINCT DeptID 
+   FROM Projects 
+);
+
+--Q8--Employees working in departments with budget > 500000
+
+Select * from Employees 
+where DeptID IN(Select DeptID from Projects where Budget>500000)
