@@ -1,0 +1,51 @@
+  --Assignment Operators
+
+ -- Q1. Increase salary of all Sales employees by 5,000
+UPDATE Employees
+SET Salary += 5000
+WHERE Department = 'Sales';
+
+--Q2. Reduce bonus of HR employees by 1,000
+UPDATE Employees
+SET Bonus -= 1000
+WHERE Department = 'HR';
+
+--Q3. Increase salary of IT employees by 10%
+UPDATE Employees
+SET Salary *= 1.10
+WHERE Department = 'IT';
+
+--Q4. Decrease salary of Finance employees by 20%
+UPDATE Employees
+SET Salary *= 0.80
+WHERE Department = 'Finance';
+
+--Q5. Add 2% tax to employees earning more than 60,000
+UPDATE Employees
+SET TaxPercent += 2
+WHERE Salary > 60000;
+
+
+--Q6. Reduce discount percentage by 2% for all sales
+UPDATE Sales
+SET DiscountPercent -= 2;
+
+--Q7. Double the sale amount for sales with quantity greater than 5
+UPDATE Sales
+SET SaleAmount *= 2
+WHERE Quantity > 5;
+
+--Q8. Reduce sale amount by half where discount is greater than 10%
+UPDATE Sales
+SET SaleAmount /= 2
+WHERE DiscountPercent > 10;
+
+--Q9. Set bonus to 0 for employees whose salary is less than 45,000
+
+UPDATE Employees
+SET Bonus = 0
+WHERE Salary < 45000;
+
+--Q10. Apply modulus assignment on quantity (Quantity % 2)
+UPDATE Sales
+SET Quantity %= 2;
