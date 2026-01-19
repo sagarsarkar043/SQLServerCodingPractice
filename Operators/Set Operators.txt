@@ -1,0 +1,78 @@
+--Set Operators
+
+--Create Tables
+CREATE TABLE IT_Employees (
+    EmployeeName VARCHAR(50)
+);
+
+CREATE TABLE HR_Employees (
+    EmployeeName VARCHAR(50)
+);
+
+--Insert Data
+INSERT INTO IT_Employees VALUES
+('Amit'), ('Neha'), ('Rina'), ('Suresh');
+
+INSERT INTO HR_Employees VALUES
+('Rina'), ('Karan'), ('Neha');
+
+--Q1. Get all employees from IT and HR (remove duplicates)
+SELECT EmployeeName FROM IT_Employees
+UNION
+SELECT EmployeeName FROM HR_Employees;
+
+--Q2. Get all employees from IT and HR including duplicates
+SELECT EmployeeName FROM IT_Employees
+UNION ALL
+SELECT EmployeeName FROM HR_Employees;
+
+--Q3. Find employees who work in both IT and HR
+SELECT EmployeeName FROM IT_Employees
+INTERSECT
+SELECT EmployeeName FROM HR_Employees;
+
+--Q4. Find employees who work in IT but not in HR
+SELECT EmployeeName FROM IT_Employees
+EXCEPT
+SELECT EmployeeName FROM HR_Employees;
+
+--Q5. Find employees who work in HR but not in IT
+SELECT EmployeeName FROM HR_Employees
+EXCEPT
+SELECT EmployeeName FROM IT_Employees;
+
+--Q6. Combine employees from both tables and sort by name
+SELECT EmployeeName FROM IT_Employees
+UNION
+SELECT EmployeeName FROM HR_Employees
+ORDER BY EmployeeName;
+
+
+--Q7. Count total employees including duplicates
+SELECT COUNT(*) AS TotalCount
+FROM (
+    SELECT EmployeeName FROM IT_Employees
+    UNION ALL
+    SELECT EmployeeName FROM HR_Employees
+) A;
+
+--Q8. Count unique employees across IT and HR
+SELECT COUNT(*) AS UniqueEmployees
+FROM (
+    SELECT EmployeeName FROM IT_Employees
+    UNION
+    SELECT EmployeeName FROM HR_Employees
+) B;
+
+--Q9. Find common employees using JOIN instead of INTERSECT
+SELECT DISTINCT I.EmployeeName
+FROM IT_Employees I
+INNER JOIN HR_Employees H
+ON I.EmployeeName = H.EmployeeName;
+
+--Q10. Find IT employees not in HR using NOT IN
+SELECT EmployeeName
+FROM IT_Employees
+WHERE EmployeeName NOT IN (
+    SELECT EmployeeName FROM HR_Employees
+);
