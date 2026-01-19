@@ -1,0 +1,86 @@
+--Having Clause
+
+--Q1.Find customers who have placed more than 1 order
+SELECT 
+    CustomerID,
+    COUNT(OrderID) AS TotalOrders
+FROM Orders
+GROUP BY CustomerID
+HAVING COUNT(OrderID) > 1;
+
+--Q2. Find products whose total quantity sold is greater than 3
+SELECT 
+    ProductID,
+    SUM(Quantity) AS TotalQuantity
+FROM Orders
+GROUP BY ProductID
+HAVING SUM(Quantity) > 3;
+
+--Q3. Find products with average discount greater than 5%
+SELECT 
+    ProductID,
+    AVG(DiscountPercent) AS AvgDiscount
+FROM Orders
+GROUP BY ProductID
+HAVING AVG(DiscountPercent) > 5;
+
+--Q4. Find customers who generated total revenue greater than 50,000
+SELECT 
+    C.CustomerName,
+    SUM(O.Quantity * P.Price) AS TotalRevenue
+FROM Orders O
+JOIN Customers C
+    ON O.CustomerID = C.CustomerID
+JOIN Products P
+    ON O.ProductID = P.ProductID
+GROUP BY C.CustomerName
+HAVING SUM(O.Quantity * P.Price) > 50000;
+
+--Q5. Find months with more than 2 orders
+SELECT 
+    MONTH(OrderDate) AS OrderMonth,
+    COUNT(OrderID) AS TotalOrders
+FROM Orders
+GROUP BY MONTH(OrderDate)
+HAVING COUNT(OrderID) > 2;
+
+--Q6. Find products that received a maximum discount of at least 10%
+SELECT 
+    ProductID,
+    MAX(DiscountPercent) AS MaxDiscount
+FROM Orders
+GROUP BY ProductID
+HAVING MAX(DiscountPercent) >= 10;
+
+--Q7. Find customers who ordered more than 3 total items
+
+SELECT 
+    CustomerID,
+    SUM(Quantity) AS TotalItems
+FROM Orders
+GROUP BY CustomerID
+HAVING SUM(Quantity) > 3;
+
+--Q8. Find products whose minimum discount is 0%
+SELECT 
+    ProductID,
+    MIN(DiscountPercent) AS MinDiscount
+FROM Orders
+GROUP BY ProductID
+HAVING MIN(DiscountPercent) = 0;
+
+--Q9. Find customers who placed orders in more than one month
+SELECT 
+    CustomerID,
+    COUNT(DISTINCT MONTH(OrderDate)) AS OrderMonths
+FROM Orders
+GROUP BY CustomerID
+HAVING COUNT(DISTINCT MONTH(OrderDate)) > 1;
+
+--Q10. Find products with average order quantity greater than 2
+SELECT 
+    ProductID,
+    AVG(Quantity) AS AvgQuantity
+FROM Orders
+GROUP BY ProductID
+HAVING AVG(Quantity) > 2;
