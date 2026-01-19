@@ -1,0 +1,140 @@
+--1. PRIMARY KEY Constraint 
+
+--Question ---Create a table Students where each student must have a unique and non-NULL StudentID. 
+
+--Answer 
+
+CREATE TABLE Students ( 
+   StudentID INT PRIMARY KEY, 
+   StudentName VARCHAR(50), 
+   Email VARCHAR(100) 
+); 
+ 
+
+--Test 
+
+INSERT INTO Students VALUES (1, 'Amit', 'amit@gmail.com');   -- Success 
+INSERT INTO Students VALUES (1, 'Neha', 'neha@gmail.com');   -- Error (duplicate PK) 
+INSERT INTO Students VALUES (NULL, 'Rina', 'rina@gmail.com');-- Error (NULL PK) 
+ 
+
+PRIMARY KEY = UNIQUE + NOT NULL 
+
+--2.FOREIGN KEY Constraint 
+
+--Question --Create Orders table where CustomerID must exist in the Customers table. 
+
+--Answer 
+
+CREATE TABLE Customers ( 
+   CustomerID INT PRIMARY KEY, 
+   CustomerName VARCHAR(50) 
+); 
+ 
+CREATE TABLE Orders ( 
+   OrderID INT PRIMARY KEY, 
+   CustomerID INT, 
+   OrderAmount DECIMAL(10,2), 
+   FOREIGN KEY (CustomerID) REFERENCES Customers(CustomerID) 
+); 
+ 
+
+--Test 
+
+INSERT INTO Customers VALUES (1, 'Rahul'); 
+ 
+INSERT INTO Orders VALUES (101, 1, 5000);   -- Success 
+INSERT INTO Orders VALUES (102, 2, 3000);   -- ❌ Error (no CustomerID = 2) 
+ 
+
+--FOREIGN KEY ensures referential integrity 
+
+
+--3. UNIQUE Constraint 
+
+--Question --Ensure that Email in the Employees table is unique. 
+
+--Answer 
+
+CREATE TABLE Employees ( 
+   EmployeeID INT PRIMARY KEY, 
+   EmployeeName VARCHAR(50), 
+   Email VARCHAR(100) UNIQUE 
+); 
+ 
+
+--Test 
+
+INSERT INTO Employees VALUES (1, 'Amit', 'amit@gmail.com'); -- Success 
+INSERT INTO Employees VALUES (2, 'Neha', 'amit@gmail.com'); -- ❌ Error (duplicate email) 
+ 
+
+--UNIQUE allows only one NULL (SQL Server behavior) 
+
+--4.NOT NULL Constraint 
+
+--Question -- Create a table Products where ProductName cannot be NULL. 
+
+--Answer 
+
+CREATE TABLE Products ( 
+   ProductID INT PRIMARY KEY, 
+   ProductName VARCHAR(50) NOT NULL, 
+   Price DECIMAL(10,2) 
+); 
+ 
+
+--Test 
+
+INSERT INTO Products VALUES (1, 'Laptop', 50000); -- Success 
+INSERT INTO Products VALUES (2, NULL, 30000);     -- ❌ Error 
+ 
+
+--NOT NULL ensures mandatory fields 
+
+--5.CHECK Constraint 
+
+--Question --Create Accounts table where Balance must be ≥ 0. 
+
+--Answer 
+
+CREATE TABLE Accounts ( 
+   AccountID INT PRIMARY KEY, 
+   AccountHolder VARCHAR(50), 
+   Balance DECIMAL(10,2), 
+   CHECK (Balance >= 0) 
+); 
+ 
+
+--Test 
+
+INSERT INTO Accounts VALUES (1, 'Suresh', 10000); -- Success 
+INSERT INTO Accounts VALUES (2, 'Karan', -500);   -- ❌ Error 
+ 
+
+--CHECK enforces business rules 
+
+--6. DEFAULT Constraint --Question 
+
+--Create Users table where CreatedDate defaults to today’s date. 
+
+--Answer 
+
+CREATE TABLE Users ( 
+   UserID INT PRIMARY KEY, 
+   UserName VARCHAR(50), 
+   CreatedDate DATE DEFAULT GETDATE() 
+); 
+ 
+
+--Test 
+
+INSERT INTO Users (UserID, UserName) 
+VALUES (1, 'Admin'); 
+ 
+SELECT * FROM Users; 
+ 
+
+--DEFAULT assigns value automatically if none is provided 
+
+ 
