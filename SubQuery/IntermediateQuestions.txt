@@ -8,3 +8,168 @@ WHERE Salary > (
     FROM Employees 
     WHERE DeptID = e.DeptID 
 ); 
+ --Q17-- Departments where avg salary > overall average 
+
+SELECT * 
+FROM Departments 
+WHERE DeptID IN (SELECT DeptID 
+    FROM Employees 
+    GROUP BY DeptID 
+    HAVING AVG(Salary) > ( 
+        SELECT AVG(Salary) 
+        FROM Employees 
+    ) 
+); 
+
+
+
+--Q18--Find departments where the average employee salary exceeds 60,000.
+SELECT *
+FROM Departments
+WHERE DeptID IN
+(
+    SELECT DeptID
+    FROM Employees
+    GROUP BY DeptID
+    HAVING AVG(Salary) > 60000
+);
+
+--Q19--Find employees who are the highest-paid in their department.
+
+SELECT *
+FROM Employees e
+WHERE Salary =
+(
+    SELECT MAX(Salary)
+    FROM Employees
+    WHERE DeptID = e.DeptID
+);
+
+--Q20--Find employees working in departments located in ‘Bangalore’.
+
+SELECT *
+FROM Employees
+WHERE DeptID IN
+(
+    SELECT DeptID
+    FROM Departments
+    WHERE Location = 'Bangalore'
+);
+
+--Q21--Find employees working in departments that have more than 2 employees.
+
+SELECT *
+FROM Employees
+WHERE DeptID IN
+(
+    SELECT DeptID
+    FROM Employees
+    GROUP BY DeptID
+    HAVING COUNT(*) > 2
+);
+
+--Q22--Find employees who do not work in any department that has a project assigned.
+
+SELECT *
+FROM Employees
+WHERE DeptID IN
+(
+    SELECT DeptID
+    FROM Projects
+);
+
+--Q23--Find departments where the maximum employee salary is greater than 50,000.
+
+SELECT *
+FROM Departments
+WHERE DeptID IN
+(
+    SELECT DeptID
+    FROM Employees
+    GROUP BY DeptID
+    HAVING MAX(Salary) > 50000
+);
+
+
+
+--Q24--Find projects whose budget is higher than the average project budget.
+
+SELECT *
+FROM Projects
+WHERE Budget >
+(
+    SELECT AVG(Budget)
+    FROM Projects
+);
+
+--Q25--Find employees who earn less than the maximum salary in the company.
+
+SELECT *
+FROM Employees
+WHERE Salary <
+(
+    SELECT MAX(Salary)
+    FROM Employees
+);
+
+--Q26--Find employees who earn less than their manager.
+
+SELECT *
+FROM Employees e
+WHERE Salary <
+(
+    SELECT Salary
+    FROM Employees m
+    WHERE m.EmpID = e.ManagerID
+);
+Select * from Employees;
+
+--Q27--Find departments where every employee earns more than 40,000.
+
+SELECT *
+FROM Departments d
+WHERE NOT EXISTS
+(
+    SELECT 1
+    FROM Employees e
+    WHERE e.DeptID = d.DeptID
+      AND e.Salary <= 40000
+);
+
+--Q28--Find employees working in the department with the highest average salary.
+
+SELECT *
+FROM Employees
+WHERE DeptID =
+(
+    SELECT TOP 1 DeptID
+    FROM Employees
+    GROUP BY DeptID
+    ORDER BY AVG(Salary) DESC
+);
+
+--Q29--Find projects belonging to the department with the highest total salary cost.
+
+SELECT *
+FROM Projects
+WHERE DeptID =
+(
+    SELECT TOP 1 DeptID
+    FROM Employees
+    GROUP BY DeptID
+    ORDER BY SUM(Salary) DESC
+);
+
+--Q30--Find employees whose salary is greater than the company 
+--average but less than the maximum salary of their department.
+
+SELECT *
+FROM Employees e
+WHERE Salary >
+      (SELECT AVG(Salary) FROM Employees)
+  AND Salary <
+      (
+          SELECT MAX(Salary)
+          FROM Employees
+          WHERE DeptID = e.DeptID
+      );
