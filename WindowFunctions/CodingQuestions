@@ -1,0 +1,356 @@
+--Q1--Assign row numbers by SaleDate 
+SELECT *, ROW_NUMBER() OVER(ORDER BY SaleDate) AS RowNum 
+FROM Sales_Data;
+
+
+--Q2--Rank sales by amount (highest first) 
+
+SELECT *, RANK() OVER(ORDER BY SalesAmount DESC) AS SalesRank 
+FROM Sales_Data; 
+ 
+
+--Q3--Dense rank products by sales amount 
+
+SELECT *, DENSE_RANK() OVER(ORDER BY SalesAmount DESC) AS DenseRankSales 
+FROM Sales_Data; 
+ 
+
+--Q4--Rank sales within each country 
+
+
+SELECT *, RANK() OVER(PARTITION BY Country ORDER BY SalesAmount DESC) AS CountryRank 
+FROM Sales_Data; 
+ 
+ 
+SELECT *, RANK() OVER(PARTITION BY Region ORDER BY SalesAmount DESC) AS RegionRank 
+FROM Sales_Data; 
+
+--Q5--Find top 2 sales per country 
+
+SELECT * 
+FROM ( 
+ SELECT *, RANK() OVER(PARTITION BY Country ORDER BY SalesAmount DESC) r 
+ FROM Sales_Data 
+) x WHERE r <=2; 
+
+--Select * from Students s where id=5;
+
+ 
+ --- SELECT Top 1 *, RANK() OVER(PARTITION BY Country ORDER BY SalesAmount DESC) r 
+ --FROM Sales_Data 
+
+--Q6--Assign NTILE(4) based on sales amount 
+
+SELECT *, NTILE(4) OVER(ORDER BY SalesAmount) as SalesBucket 
+ FROM Sales_Data 
+SELECT *, NTILE(4) OVER(ORDER BY SalesAmount DESC) AS SalesBucket 
+FROM Sales_Data; 
+ 
+
+--Q7--Show previous sale amount (LAG) 
+--arranged by SalesDate -ASC-Past Date is on top of the current Date
+
+SELECT *, LAG(SalesAmount,1) OVER(ORDER BY SalesDate) AS PrevSale 
+FROM Sales_Data;
+
+SELECT *, LAG(SalesAmount,1) OVER(ORDER BY SaleDate) AS PrevSale 
+FROM Sales_Data; 
+
+--Q8--Show next sale amount (LEAD) 
+
+SELECT *, LEAD(SalesAmount) OVER(ORDER BY SaleDate) AS NextSale 
+FROM Sales_Data; 
+ 
+
+--Q9--Get first sale amount per country 
+
+SELECT *, FIRST_VALUE(SalesAmount) 
+OVER(PARTITION BY Country ORDER BY SaleDate) AS FirstSale 
+FROM Sales_Data; 
+ 
+
+--Q10-- Get last sale amount per country 
+
+SELECT *, LAST_VALUE(SalesAmount) 
+OVER(PARTITION BY Country ORDER BY SaleDate 
+ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS LastSale 
+FROM Sales_Data; 
+ 
+--LAST_VALUE()
+--LAST_VALUE requires frame reset; otherwise it returns the current row.
+
+--Take all the rows in the partition — from the first row to the last row.”
+
+--Nothing is excluded.
+--The window frame covers every row in that group.
+
+--Why do we use it?
+
+--Because functions like LAST_VALUE() normally only look up to the current row.
+--To get the true last row, we must tell SQL Server:
+
+--“Look at all rows, not just the rows before the current one.”
+
+'''
+| Query   | Window Frame Used | LAST_VALUE returns |
+| ------- | ----------------- | ------------------ |
+| Query 1 | Entire partition  | True last value    |
+| Query 2 | Up to current row | Current row value  |
+'''
+
+
+--Q11--Total sales by region 
+
+SELECT Region, SUM(SalesAmount) AS TotalSales 
+FROM Sales_Data 
+GROUP BY Region; 
+ 
+
+--Q12--Total sales by region and country 
+
+SELECT Region, Country, SUM(SalesAmount) AS TotalSales 
+FROM Sales_Data 
+GROUP BY Region, Country; 
+ 
+
+--Q13--Count sales per category 
+
+SELECT Category, COUNT(*) AS Orders 
+FROM Sales_Data 
+GROUP BY Category; 
+ 
+--Q14--Average sales amount per product 
+
+SELECT Product, AVG(SalesAmount) AS AvgSales 
+FROM Sales_Data 
+GROUP BY Product; 
+ 
+--Q15--Highest sale in each region 
+
+SELECT Region, MAX(SalesAmount) AS MaxSale 
+FROM Sales_Data 
+GROUP BY Region; 
+ 
+
+--Focus: partitions, trends, GROUP BY extensions 
+
+--Q16--Top 2 sales per country 
+
+SELECT * 
+FROM ( 
+ SELECT *, DENSE_RANK() OVER(PARTITION BY Country ORDER BY SalesAmount DESC) r 
+ FROM Sales_Data 
+) x WHERE r <= 2; 
+
+--Q17--Running total of sales 
+
+SELECT *, SUM(SalesAmount) 
+OVER(ORDER BY SaleDate) AS RunningTotal 
+FROM Sales_Data; 
+
+Select SaleDate,SUM(SalesAmount) as Total
+from Sales_Data
+Group by SaleDate;
+
+
+--Q18--Sales difference from previous day 
+
+SELECT *, SalesAmount - LAG(SalesAmount) 
+OVER(ORDER BY SaleDate) AS DiffFromPrev 
+FROM Sales_Data; 
+ 
+
+--Q19--First and last purchase per customer 
+
+SELECT *, 
+FIRST_VALUE(SaleDate) OVER(PARTITION BY CustomerID ORDER BY SaleDate) AS FirstPurchase, 
+LAST_VALUE(SaleDate) OVER(PARTITION BY CustomerID ORDER BY SaleDate 
+ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS LastPurchase 
+FROM Sales_Data; 
+ 
+
+--Q20--Sales quartiles per region 
+
+SELECT *, NTILE(4) 
+OVER(PARTITION BY Region ORDER BY SalesAmount DESC) AS Quartile 
+FROM Sales_Data; 
+ 
+
+--Q21--Region-wise and grand total (ROLLUP) 
+
+SELECT Region, Country, SUM(SalesAmount) AS TotalSales 
+FROM Sales_Data 
+GROUP BY ROLLUP (Region, Country); 
+
+SELECT Region, Country, SUM(SalesAmount) AS TotalSales 
+FROM Sales_Data 
+GROUP BY ROLLUP ( Country,Region); 
+ 
+--Q22--Country and category totals (GROUPING SETS) 
+
+SELECT Country, Category, SUM(SalesAmount) AS TotalSales 
+FROM Sales_Data 
+GROUP BY GROUPING SETS ( 
+  (Country, Category), 
+   (Country), 
+   () 
+); 
+ 
+--Q23--Full aggregation matrix (CUBE) 
+
+SELECT Region, Country, Category, SUM(SalesAmount) AS TotalSales 
+FROM Sales_Data 
+GROUP BY CUBE (Region, Country, Category); 
+ 
+
+--Q24--Identify subtotal rows 
+
+SELECT Region, Country, 
+GROUPING(Country) AS IsSubtotal,
+GROUPING(Region) AS IsRegionSubTotal,
+ --0,1- 1--Not a subtotal , 0- Is a subtotal
+SUM(SalesAmount) AS TotalSales 
+FROM Sales_Data 
+GROUP BY ROLLUP (Region, Country); 
+ 
+
+
+
+
+--Q25--Rank customers by total sales 
+
+Select * from Sales_Data;
+
+
+SELECT CustomerID, SUM(SalesAmount) AS TotalSales, 
+RANK() OVER(ORDER BY SUM(SalesAmount) DESC) AS Rank 
+FROM Sales_Data 
+GROUP BY CustomerID; 
+ 
+
+--Q26--Highest selling product per region 
+
+SELECT * 
+FROM ( 
+ SELECT Region, Product, SUM(SalesAmount) AS Sales, 
+ RANK() OVER(PARTITION BY Region ORDER BY SUM(SalesAmount) DESC) r 
+ FROM Sales_Data 
+ GROUP BY Region, Product 
+) x WHERE r = 1; 
+ 
+
+--Q27--Customer repeat purchase flag 
+
+SELECT *,  
+CASE WHEN LAG(CustomerID) OVER(PARTITION BY CustomerID ORDER BY SaleDate) IS NULL 
+THEN 'First Purchase' ELSE 'Repeat Purchase' END AS PurchaseType 
+FROM Sales_Data; 
+
+SELECT *,  LAG(CustomerID) OVER(PARTITION BY CustomerID ORDER BY SaleDate) 
+FROM Sales_Data; 
+ 
+
+--Q28--Month-wise sales trend 
+
+SELECT MONTH(SaleDate) AS Month, SUM(SalesAmount) AS TotalSales 
+FROM Sales_Data 
+GROUP BY MONTH(SaleDate); 
+
+Select * from Sales_Data;
+
+--Day-wise sales trend 
+SELECT DAY(SaleDate) AS DayN, SUM(SalesAmount) AS TotalSales 
+FROM Sales_Data 
+GROUP BY Day(SaleDate); 
+
+Select * from Sales_Data;
+
+ 
+--Q29-- Cumulative sales per country 
+
+SELECT *, SUM(SalesAmount) 
+OVER(PARTITION BY Country ORDER BY SaleDate) AS CumSales 
+FROM Sales_Data; 
+
+--Q30--Rank cities by sales within country 
+
+SELECT *, RANK() 
+OVER(PARTITION BY Country ORDER BY SalesAmount DESC) AS CityRank 
+FROM Sales_Data; 
+ 
+
+--Q31--Percentage contribution of each sale 
+
+SELECT *,  
+SalesAmount * 100.0 / SUM(SalesAmount) OVER() AS ContributionPct 
+FROM Sales_Data; 
+ 
+
+--Q32--Top-selling category per country 
+SELECT * 
+FROM ( 
+ SELECT Country, Category, SUM(SalesAmount) AS Sales, 
+ RANK() OVER(PARTITION BY Country ORDER BY SUM(SalesAmount) DESC) r 
+ FROM Sales_Data 
+ GROUP BY Country, Category 
+) x WHERE r = 1; 
+ 
+
+--Q33-Customer lifetime value 
+
+SELECT CustomerID, SUM(SalesAmount) AS LifetimeValue 
+FROM Sales_Data 
+GROUP BY CustomerID; 
+
+--Q34--Bottom 10% sales using NTILE 
+
+SELECT * 
+FROM ( 
+ SELECT *, NTILE(10) OVER(ORDER BY SalesAmount) n 
+ FROM Sales_Data 
+) x WHERE n = 1; 
+ 
+
+--Q35--region contribution to total sales 
+
+SELECT Region, 
+SUM(SalesAmount) * 100.0 / SUM(SUM(SalesAmount)) OVER() AS RegionPct 
+FROM Sales_Data 
+GROUP BY Region; 
+ 
+
+--Q36--Rolling 3-day sales total 
+
+SELECT *, SUM(SalesAmount) 
+OVER(ORDER BY SaleDate 
+ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) AS Rolling3DaySales 
+FROM Sales_Data; 
+
+--It calculates a running average of SalesAmount over the current 
+--row and the previous 2 rows, ordered by SaleDate.
+---This is also called a 3-row moving average.
+/*
+It calculates a rolling 3-row (3-day) sales total by summing the
+ current row’s SalesAmount and the previous two rows, ordered by SaleDate.
+*/
+
+--Q37--Identify sales growth or decline 
+
+SELECT *, 
+CASE WHEN SalesAmount > LAG(SalesAmount) OVER(ORDER BY SaleDate) 
+THEN 'Growth' ELSE 'Decline' END AS Trend 
+FROM Sales_Data; 
+ 
+
+--Q38--Executive summary using GROUPING SETS 
+
+SELECT Region, Country, Category, SUM(SalesAmount) AS TotalSales 
+FROM Sales_Data 
+GROUP BY GROUPING SETS ( 
+  (Region, Country, Category), 
+   (Region, Country), 
+   (Region), 
+   () 
+); 
+
+ 
