@@ -1,0 +1,18 @@
+--INSERT DATA
+INSERT INTO Sales_Data VALUES
+(1,'2024-01-01','Asia','India','Mumbai',101,'Laptop','Electronics',90000,1),
+(2,'2024-01-02','Asia','India','Delhi',102,'Mobile','Electronics',60000,2),
+(3,'2024-01-03','Asia','India','Mumbai',103,'Tablet','Electronics',30000,1),
+(4,'2024-01-04','Asia','India','Pune',101,'Laptop','Electronics',90000,1),
+(5,'2024-01-05','Asia','India','Delhi',104,'Headphones','Accessories',5000,3),
+
+(6,'2024-01-01','Europe','Germany','Berlin',201,'Laptop','Electronics',95000,1),
+(7,'2024-01-02','Europe','Germany','Munich',202,'Mobile','Electronics',65000,1),
+(8,'2024-01-03','Europe','France','Paris',203,'Tablet','Electronics',35000,2),
+(9,'2024-01-04','Europe','France','Lyon',204,'Headphones','Accessories',6000,2),
+
+(10,'2024-01-01','America','USA','New York',301,'Laptop','Electronics',100000,1),
+(11,'2024-01-02','America','USA','Chicago',302,'Mobile','Electronics',70000,1),
+(12,'2024-01-03','America','USA','Dallas',303,'Tablet','Electronics',40000,1),
+(13,'2024-01-04','America','Canada','Toronto',304,'Laptop','Electronics',98000,1),
+(14,'2024-01-05','America','Canada','Vancouver',305,'Mobile','Electronics',65000,1);
