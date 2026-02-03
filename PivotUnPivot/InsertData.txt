@@ -1,0 +1,17 @@
+--Insert Data
+INSERT INTO EmployeeSales VALUES
+(1,'Amit','North','Laptop','Jan',50000),
+(1,'Amit','North','Laptop','Feb',60000),
+(1,'Amit','North','Mobile','Jan',30000),
+(1,'Amit','North','Mobile','Feb',35000),
+
+(2,'Neha','South','Laptop','Jan',45000),
+(2,'Neha','South','Laptop','Feb',48000),
+(2,'Neha','South','Mobile','Jan',25000),
+
+(3,'Rahul','East','Laptop','Jan',40000),
+(3,'Rahul','East','Mobile','Feb',28000),
+
+(4,'Priya','West','Laptop','Jan',55000),
+(4,'Priya','West','Mobile','Jan',32000),
+(4,'Priya','West','Mobile','Feb',36000);
