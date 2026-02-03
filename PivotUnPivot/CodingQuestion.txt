@@ -1,0 +1,181 @@
+--Q1--Show total sales per month as columns
+
+SELECT *
+FROM (
+    SELECT SaleMonth, SalesAmount
+    FROM EmployeeSales
+) s
+PIVOT (
+    SUM(SalesAmount)
+    FOR SaleMonth IN ([Jan], [Feb])
+) p;
+
+--Q2--Employee-wise sales by month
+SELECT *
+FROM (
+    SELECT EmpName, SaleMonth, SalesAmount
+    FROM EmployeeSales
+) s
+PIVOT (
+    SUM(SalesAmount)
+    FOR SaleMonth IN ([Jan], [Feb])
+) p;
+
+--Q3--Product-wise monthly sales
+SELECT *
+FROM (
+    SELECT Product, SaleMonth, SalesAmount
+    FROM EmployeeSales
+) s
+PIVOT (
+    SUM(SalesAmount)
+    FOR SaleMonth IN ([Jan], [Feb])
+) p;
+
+--Q4--Region-wise sales by product
+SELECT *
+FROM (
+    SELECT Region, Product, SalesAmount
+    FROM EmployeeSales
+) s
+PIVOT (
+    SUM(SalesAmount)
+    FOR Product IN ([Laptop], [Mobile])
+) p;
+
+--Q5--Total sales per employee per product
+SELECT *
+FROM (
+    SELECT EmpName, Product, SalesAmount
+    FROM EmployeeSales
+) s
+PIVOT (
+    SUM(SalesAmount)
+    FOR Product IN ([Laptop], [Mobile])
+) p;
+
+--Q6--Replace NULLs with zero after pivot
+SELECT EmpName,
+       ISNULL([Laptop],0) AS LaptopSales,
+       ISNULL([Mobile],0) AS MobileSales
+FROM (
+    SELECT EmpName, Product, SalesAmount
+    FROM EmployeeSales
+) s
+PIVOT (
+    SUM(SalesAmount)
+    FOR Product IN ([Laptop], [Mobile])
+) p;
+
+--Q7--Month-wise sales without using PIVOT (interview comparison)
+SELECT EmpName,
+       SUM(CASE WHEN SaleMonth='Jan' THEN SalesAmount ELSE 0 END) AS JanSales,
+       SUM(CASE WHEN SaleMonth='Feb' THEN SalesAmount ELSE 0 END) AS FebSales
+FROM EmployeeSales
+GROUP BY EmpName;
+
+--Q8️ Employee-wise monthly sales across regions
+SELECT *
+FROM (
+    SELECT EmpName, Region, SaleMonth, SalesAmount
+    FROM EmployeeSales
+) s
+PIVOT (
+    SUM(SalesAmount)
+    FOR SaleMonth IN ([Jan], [Feb])
+) p;
+
+--Q9--Total sales by region and month
+SELECT *
+FROM (
+    SELECT Region, SaleMonth, SalesAmount
+    FROM EmployeeSales
+) s
+PIVOT (
+    SUM(SalesAmount)
+    FOR SaleMonth IN ([Jan], [Feb])
+) p;
+
+--Q10-- Highest selling product per month
+WITH P AS (
+    SELECT *
+    FROM (
+        SELECT Product, SaleMonth, SalesAmount
+        FROM EmployeeSales
+    ) s
+    PIVOT (
+        SUM(SalesAmount)
+        FOR SaleMonth IN ([Jan], [Feb])
+    ) p
+)
+SELECT *
+FROM P;
+
+
+--Q11--Unpivot month-wise columns into rows
+SELECT EmpName, SaleMonth, Sales
+FROM (
+    SELECT EmpName,
+           SUM(CASE WHEN SaleMonth='Jan' THEN SalesAmount END) AS Jan,
+           SUM(CASE WHEN SaleMonth='Feb' THEN SalesAmount END) AS Feb
+    FROM EmployeeSales
+    GROUP BY EmpName
+) p
+UNPIVOT (
+    Sales FOR SaleMonth IN (Jan, Feb)
+) u;
+
+--Q12--Convert product columns back into rows
+SELECT EmpName, Product, Sales
+FROM (
+    SELECT EmpName,
+           SUM(CASE WHEN Product='Laptop' THEN SalesAmount END) AS Laptop,
+           SUM(CASE WHEN Product='Mobile' THEN SalesAmount END) AS Mobile
+    FROM EmployeeSales
+    GROUP BY EmpName
+) p
+UNPIVOT (
+    Sales FOR Product IN (Laptop, Mobile)
+) u;
+
+--Q13-- Pivot + filter only employees with Laptop sales
+SELECT *
+FROM (
+    SELECT EmpName, Product, SalesAmount
+    FROM EmployeeSales
+) s
+PIVOT (
+    SUM(SalesAmount)
+    FOR Product IN ([Laptop], [Mobile])
+) p
+WHERE Laptop IS NOT NULL;
+
+--Q14-- Percentage contribution of each product per employee
+WITH P AS (
+    SELECT *
+    FROM (
+        SELECT EmpName, Product, SalesAmount
+        FROM EmployeeSales
+    ) s
+    PIVOT (
+        SUM(SalesAmount)
+        FOR Product IN ([Laptop], [Mobile])
+    ) p
+)
+SELECT EmpName,
+       Laptop * 100.0 / (Laptop + Mobile) AS LaptopPct,
+       Mobile * 100.0 / (Laptop + Mobile) AS MobilePct
+FROM P;
+
+--Q15--Unpivot multi-month sales into normalized form
+SELECT EmpName, Month, Sales
+FROM (
+    SELECT EmpName,
+           SUM(CASE WHEN SaleMonth='Jan' THEN SalesAmount END) AS Jan,
+           SUM(CASE WHEN SaleMonth='Feb' THEN SalesAmount END) AS Feb
+    FROM EmployeeSales
+    GROUP BY EmpName
+) p
+UNPIVOT (
+    Sales FOR Month IN (Jan, Feb)
+) u;
